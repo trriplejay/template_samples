@@ -53,7 +53,7 @@ pipelines:
             - pushd $res_{{ .Values.github.utils.name }}_resourcePath
             - python3 --version
             - cat docker-compose.yaml
-            - docker-compose up mysql
+            - docker-compose up -d mysql
             - sleep 10
             - docker ps -a
             - push $res_{{ .Values.github.app.name }}_resourcePath
