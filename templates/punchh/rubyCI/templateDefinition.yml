@@ -37,12 +37,12 @@ pipelines:
             - name: {{ .Values.github.utils.name }}
           integrations:
             - name: {{ .Values.integrations.slackName }}
-        stepMultipliers:
-          environmentVariables:
-            - NODENUMBER: 0
-            - NODENUMBER: 1
-            - NODENUMBER: 2
-            - NODENUMBER: 3
+          stepMultipliers:
+            environmentVariables:
+              - NODENUMBER: 0
+              - NODENUMBER: 1
+              - NODENUMBER: 2
+              - NODENUMBER: 3
         execution:
           onStart:
             - send_notification {{ .Values.integrations.slackName }} --text "starting step $step_name" || true
