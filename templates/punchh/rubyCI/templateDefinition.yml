@@ -35,6 +35,7 @@ pipelines:
           inputResources:
             - name: {{ .Values.github.app.name }}
             - name: {{ .Values.github.utils.name }}
+              trigger: false
           integrations:
             - name: {{ .Values.integrations.slackName }}
         stepletMultipliers:
@@ -51,7 +52,7 @@ pipelines:
           onExecute:
             - pushd $res_{{ .Values.github.utils.name }}_resourcePath
             - python3 --version
-            - cat docker-compose.yml
+            - cat docker-compose.yaml
             - docker-compose up mysql
             - sleep 10
             - docker ps -a
