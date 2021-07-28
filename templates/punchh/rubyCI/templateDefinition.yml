@@ -1,0 +1,63 @@
+resources:
+# a common repo containing scripts used across multiple steps
+  - name: {{ .Values.github.utils.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: github
+      path: trriplejay/step_samples
+      branches:
+       include: ^{{ .Values.github.utils.branch }}$
+
+  - name: {{ .Values.github.app.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: github
+      path: trriplejay/simpleserver
+      branches:
+        include: ^{{ .Values.github.app.branch }}$
+
+# for connect JFrog Pipelines to a jfrogartifactory source.
+  - name: {{ .Values.image.name }}
+    type: Image
+    configuration:
+      registry: artifactory
+      sourceRepository: docker-local
+      imageName: punchhdev.jfrog.io/docker-local/{{ .Values.image.imagename }}
+      imageTag: {{ .Values.image.imageTag }}
+# pipline with single step for building docker image on custom runtime image container.
+pipelines:
+  - name: {{ .Values.pipeline.name }}
+    steps:
+      - name: matrix_test
+        type: Matrix
+        configuration:
+          multiNode: true
+          inputResources:
+            - name: {{ .Values.github.app.name }}
+            - name: {{ .Values.github.utils.name }}
+          integrations:
+            - name: {{ .Values.integrations.slackName }}
+        stepMultipliers:
+          environmentVariables:
+            - NODENUMBER: 0
+            - NODENUMBER: 1
+            - NODENUMBER: 2
+            - NODENUMBER: 3
+        execution:
+          onStart:
+            - send_notification {{ .Values.integrations.slackName }} --text "starting step $step_name" || true
+            - sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            - sudo chmod +x /usr/local/bin/docker-compose
+          onExecute:
+            - pushd $res_{{ .Values.github.utils.name }}_resourcePath
+            - python3 --version
+            - cat docker-compose.yml
+            - docker-compose up mysql
+            - sleep 10
+            - docker ps -a
+            - push $res_{{ .Values.github.app.name }}_resourcePath
+            - ls -latr
+            - echo "run some tests"
+          onComplete:
+            - send_notification {{ .Values.integrations.slackName }} --text "finished step $step_name" || true
+
