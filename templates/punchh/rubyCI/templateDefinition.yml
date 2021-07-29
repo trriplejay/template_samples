@@ -29,12 +29,12 @@ pipelines:
   - name: {{ .Values.pipeline.name }}
     configuration:
       runtime:
-      type: image
-      image:
-        custom:
-          name: kanishkrajawat01/u16ruball
-          tag: latest
-          options: --network=host
+        type: image
+        image:
+          custom:
+            name: kanishkrajawat01/u16ruball
+            tag: latest
+            options: --network=host
     steps:
       - name: matrix_test
         type: Matrix
