@@ -57,7 +57,7 @@ pipelines:
             - docker-compose up -d mysql
             - sleep 10
             - docker ps -a
-            - push $res_{{ .Values.github.app.name }}_resourcePath
+            - pushd $res_{{ .Values.github.app.name }}_resourcePath
             - ls -latr
             - echo "run some tests"
           onComplete:
