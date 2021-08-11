@@ -1,0 +1,38 @@
+resources:
+  - name: {{ .Values.source.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.integration }}
+      path: {{ .Values.source.path }}
+      branches:
+        include: "^{{ .Values.source.branch }}$"
+
+
+pipelines:
+  - name: {{ .Values.pipeline.name }}
+    steps:
+{{ if .Values.test }}
+      - name: first_step
+        type: Bash
+        configuration:
+          inputResources:
+            - name: {{ .Values.source.name }}
+        execution:
+          onExecute:
+            - echo "hello"
+            - pushd "$res_{{.Values.source.name}}_resourcePath"
+            - ls
+            - echo "test is {{ .Values.test }}"
+{{ end }}
+      - name: second_step
+        type: Bash
+        configuration:
+          inputResources:
+            - name: {{ .Values.source.name }}
+{{ if .Values.test }}
+          inputSteps:
+            - name: first_step
+{{ end }}
+        execution:
+          onExecute:
+            - echo "test is {{ .Values.test }}"
