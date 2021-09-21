@@ -1,0 +1,11 @@
+resources:
+  - name: gittest
+    type: GitRepo
+    configuration:
+      gitProvder: github
+      path: trriplejay/simpleserver
+      branches:
+        include: {{gitBranch}}
+
+
+

@@ -1,0 +1,105 @@
+resources:
+# a common repo containing scripts used across multiple steps
+  - name: {{ .Values.github.utils.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: github
+      path: trriplejay/step_samples
+      branches:
+       include: "^{{ .Values.github.utils.branch }}$"
+
+  - name: {{ .Values.github.app.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: github
+      path: trriplejay/simpleserver
+      branches:
+        include: ^{{ .Values.github.app.branch }}$
+
+  - name: "{{ .Values.github.app.name }}_buildinfo"
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: artifactory
+
+  - name: {{ .Values.image.name }}
+    type: Image
+    configuration:
+      registry: artifactory
+      sourceRepository: docker-local
+      imageName: punchhdemo.jfrogdev.org/demodocker/{{ .Values.image.imagename }}
+      imageTag: {{ .Values.image.imageTag }}
+
+
+pipelines:
+  - name: {{ .Values.pipeline.name }}
+    configuration:
+      environmentVariables:
+        readOnly:
+          JFROG_CLI_BUILD_NAME: {{ .Values.pipeline.name }}
+    steps:
+      - name: ci
+        type: Bash
+        configuration:
+          inputResources:
+            - name: {{ .Values.github.app.name }}
+          integrations:
+            - name: artifactory
+        execution:
+          onExecute:
+            - |
+              if [ {{gitBranch}} == "master" ]; then
+                pushd ${res_{{ .Values.github.app.name }}_resourcePath}
+                npm test
+              fi
+      - name: build
+        type: DockerBuild
+        configuration:
+          affinityGroup: build_and_push
+          dockerImageName: punchhdemo.jfrogdev.org/demodocker/{{ .Values.image.imagename }}
+          dockerImageTag: ${run_number}
+          integrations:
+            - name: artifactory
+          inputResources:
+            - name: {{ .Values.github.app.name }}
+              trigger: false
+          inputSteps:
+            - name: ci
+        execution:
+          onStart:
+            - if [ {{gitBranch}} != "master" ]; then exit 1; fi
+      - name: push
+        type: DockerPush
+        configuration:
+          affinityGroup: build_and_push
+          targetRepository: demodocker
+          autoPublishBuildInfo: true
+          inputSteps:
+            - name: build
+          outputResources:
+            - name: "{{ .Values.github.app.name }}_buildinfo"
+            - name: "{{ .Values.image.name }}"
+      # - name: build_and_push
+      #   type: Bash
+      #   configuration:
+      #     inputResources:
+      #       - name: {{ .Values.github.app.name }}
+      #         trigger: false
+      #     outputResources:
+      #       - name: "{{ .Values.github.app.name }}_buildinfo"
+      #       - name: "{{ .Values.image.name }}"
+      #     integrations:
+      #       - name: artifactory
+      #     execution:
+      #       onExecute:
+      #         - |
+      #           if [ {{gitBranch}} == "master" ]; then
+      #             pushd ${res_{{ .Values.github.app.name }}_resourcePath}
+      #             docker build -t punchhdemo.jfrogdev.org/demodocker/{{ .Values.image.imagename }}:${run_number}
+      #             jfrog rt docker-push punchhdemo.jfrogdev.org/demodocker/{{ .Values.image.imagename }}:${run_number} --build-name $JFROG_CLI_BUILD_NAME --build-number ${run_number}
+      #             jfrog rt build-collect-environment --build-name $JFROG_CLI_BUILD_NAME --build-number ${run_number}
+      #             jfrog rt bag --build-name $JFROG_CLI_BUILD_NAME --build-number ${run_number}
+      #             jfrog rt bp ${JFROG_CLI_BUILD_NAME} ${run_number}
+      #             write_output {{ .Values.github.app.name }}_buildinfo "buildName=${JFROG_CLI_BUILD_NAME}" "buildNumber=${run_number}"
+      #             write_output {{ .Values.image.name }} "imageName={{ .Values.image.imagename }}" "imageTag=${run_number}"
+      #           fi
+

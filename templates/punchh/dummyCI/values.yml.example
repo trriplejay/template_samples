@@ -1,0 +1,19 @@
+github:
+  utils:
+    name: gh_utils
+    branch: {{gitBranch}}
+  app:
+    name: my_application
+    branch: {{gitBranch}}
+image:
+  name: build_u20ruby
+  imageTag: latest
+
+pipeline:
+  name: build_and_publish
+  imagename: simpleserver
+  imageTag: latest
+docker:
+  filepath: .
+integrations:
+  slackName: mySlack
