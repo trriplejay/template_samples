@@ -2,4 +2,20 @@ resources:
   - name: myBag
     type: PropertyBag
     configuration:
-      foo: '{{ if or (eq "{{ .Values.test }}" "1") (eq "{{ .Values.server }}" "1") }}'
+    {{ if or (eq "{{ .Values.test }}" "1") (eq "{{ .Values.server }}" "1") }}
+      foo: "test or server is 1"
+    {{ else }}
+      foo: "test or server are NOT 1"
+    {{ end }}
+
+pipelines:
+  - name: "myTestConditionalPipe"
+    steps:
+      - name: first
+        type: Bash
+        configuration:
+          inputResources:
+            - name: myBag
+        execution:
+          onExecute:
+            - echo "foo is... $foo"
