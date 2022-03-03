@@ -15,7 +15,7 @@ pipelines:
         type: Bash
         configuration:
           inputResources:
-            - name: myBag
+            - name: myBag_{{ .Values.name }}
         execution:
           onExecute:
             - echo "foo is... $foo"
