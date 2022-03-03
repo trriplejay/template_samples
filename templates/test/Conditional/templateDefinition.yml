@@ -2,11 +2,7 @@ resources:
   - name: myBag_{{ .Values.name }}
     type: PropertyBag
     configuration:
-      test: test_{{ .Values.test }}
-      server: server_{{ .Values.server }}
-    {{ if (eq "{{ .Values.test }}" "1") }}
-      foo: "test or server is 1"
-    {{ else if (eq "{{ .Values.server }}" "1") }}
+    {{ if eq ".Values.test" "1") (eq ".Values.server" "1") }}
       foo: "test or server is 1"
     {{ else }}
       foo: "test or server are NOT 1"
