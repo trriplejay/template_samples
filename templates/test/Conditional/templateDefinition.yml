@@ -1,0 +1,5 @@
+resources:
+  - name: myBag
+    type: PropertyBag
+    configuration:
+      foo: '{{ if or (eq "{{ .Values.test }}" "1") (eq "{{ .Values.server }}" "1") }}'
