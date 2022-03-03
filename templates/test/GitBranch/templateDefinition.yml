@@ -1,5 +1,5 @@
 resources:
-  - name: gittest_{{ .Values.name | replace "-" "_" }}
+  - name: gittest_{{ .Values.name | default "" | replace "-" "_" }}
     type: GitRepo
     configuration:
       gitProvider: github
