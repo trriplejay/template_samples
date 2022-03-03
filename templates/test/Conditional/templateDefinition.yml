@@ -2,7 +2,7 @@ resources:
   - name: myBag_{{ .Values.name }}
     type: PropertyBag
     configuration:
-    {{ $result := (or ".Values.test" ".Values.server")}}
+    {{ $result := (or .Values.test .Values.server)}}
       result: {{ $result }}
     {{ if $result }}
       foo: "test or server is 1"
