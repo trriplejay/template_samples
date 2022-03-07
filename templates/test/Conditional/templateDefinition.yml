@@ -17,5 +17,22 @@ pipelines:
           inputResources:
             - name: myBag_{{ .Values.name }}
         execution:
+          onStart:
+            - echo "first step"
           onExecute:
             - echo "foo is... $foo"
+
+            - printenv
+      - name: second
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: first
+          inputResources:
+            - name: myBag_{{ .Values.name }}
+        execution:
+          onStart:
+            - echo "second step"
+          onExecute:
+            - echo "foo is... $foo"
+            - printenv
