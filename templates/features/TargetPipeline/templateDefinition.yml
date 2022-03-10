@@ -23,7 +23,7 @@ pipelines:
         type: Bash
         configuration:
           inputSteps:
-            - name: first
+            - name: start
           inputResources:
             - name: myBag_{{ .Values.name }}
         execution:
