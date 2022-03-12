@@ -58,3 +58,18 @@ pipelines:
           onExecute:
             - echo "foo is... $foo"
             - printenv | grep parent
+
+  - name: failer_{{ .Values.name }}
+    steps:
+      - name: start
+        type: Bash
+        configuration:
+          inputResources:
+            - name: myBag_{{ .Values.name }}
+        execution:
+          onStart:
+            - echo "start the step, destined to fail"
+          onExecute:
+            - echo "foo is... $foo"
+            - printenv | grep parent
+            - badcmd
