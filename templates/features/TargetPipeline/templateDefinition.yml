@@ -73,3 +73,27 @@ pipelines:
             - echo "foo is... $foo"
             - printenv | grep parent
             - badcmd
+
+
+  - name: bad_pipes_{{ .Values.name }}
+    steps:
+      - name: self_cancel
+        type: Bash
+        execution:
+          onExecute:
+            - sleep 5
+            - export payload="{\"statusCode\":\"4013\"}"
+            - curl -XPUT -H "Authorization:Bearer $builder_api_token" -H "Content-type:application/json" $pipelines_api_url/steps/$step_id -d "$payload"
+            - sleep 60
+
+      - name: self_error
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: self_cancel
+        execution:
+          onExecute:
+            - sleep 5
+            - export payload="{\"statusCode\":\"4004\"}"
+            - curl -XPUT -H "Authorization:Bearer $builder_api_token" -H "Content-type:application/json" $pipelines_api_url/steps/$step_id -d "$payload"
+            - sleep 60
