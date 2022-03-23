@@ -32,33 +32,6 @@ pipelines:
           onExecute:
             - printenv | grep parent
 
-  - name: double_name_a
-    steps:
-      - name: double_name
-        type: Bash
-        configuration:
-          inputResources:
-            - name: myBag_{{ .Values.name }}
-        execution:
-          onStart:
-            - echo "start step"
-          onExecute:
-            - echo "foo is... $foo"
-            - printenv | grep parent
-  - name: double_name_b
-    steps:
-      - name: double_name
-        type: Bash
-        configuration:
-          inputResources:
-            - name: myBag_{{ .Values.name }}
-        execution:
-          onStart:
-            - echo "start step"
-          onExecute:
-            - echo "foo is... $foo"
-            - printenv | grep parent
-
   - name: failer_{{ .Values.name }}
     steps:
       - name: start
