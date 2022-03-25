@@ -1,0 +1,19 @@
+function foo2() {info_logger "foo2 is here with $@"}
+
+pipelines:
+  - name: mypipe_{{ .Values.name }}
+    steps:
+      - name: step1
+        type: Bash
+        execution:
+          onStart:
+            - foo "hello onstart" || true
+          onExecute:
+            - 'function foo() {echo "foo is here with args: $@"}'
+            # - export foo
+          onComplete:
+            - foo "hello oncomplete" || true
+          onSuccess:
+            - foo "hello onsuccess" || true
+          onFailure:
+            - foo "hello onfailure" || true
