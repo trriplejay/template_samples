@@ -11,7 +11,7 @@ pipelines:
           onStart:
             - foo "hello onstart" || true
           onExecute:
-            - 'function foo() { echo "foo is here with args: $@" }'
+            - 'function foo() { echo "foo is here with args: $@"; }'
             # - export foo
           onComplete:
             - foo "hello oncomplete" || true
