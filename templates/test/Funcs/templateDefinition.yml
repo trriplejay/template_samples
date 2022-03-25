@@ -10,14 +10,15 @@ pipelines:
         execution:
           onStart:
             - foo "hello onstart" || true
-          onExecute: |
-            echo "here we go"
-            function foo() {
-              echo "foo is here with args: $@";
-            }
-            echo "we did it!"
-            export -f foo
-            echo "done exporting"
+          onExecute:
+            - |
+                echo "here we go"
+                function foo() {
+                  echo "foo is here with args: $@";
+                }
+                echo "we did it!"
+                export -f foo
+                echo "done exporting"
           onComplete:
             - foo "hello oncomplete" || true
           onSuccess:
