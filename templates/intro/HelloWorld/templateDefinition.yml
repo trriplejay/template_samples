@@ -90,11 +90,11 @@ pipelines:
             - name: run_variable_step
           environmentVariables:
             forceFail:
-              default: false
+              default: "false"
               description: "set to 'true' to force the step to fail."
               values:
-                - false
-                - true
+                - "false"
+                - "true"
         execution:
           onStart:
             - if [ ${forceFail} == "true" ]; then exit 1; fi
