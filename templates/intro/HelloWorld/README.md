@@ -7,3 +7,4 @@ This pipeline will showcase a few of the available features in JFrog Pipelines
 - using "run variables" to pass information between steps
 - customizable environment variables
 - different execution sections
+- shared affinity group workspace
