@@ -57,7 +57,7 @@ pipelines:
           onStart:
             - echo "Updating resource {{ .Values.namePrefix }}_bag with new key/value pairs"
           onExecute:
-            - write_output {{ .Values.namePrefix }}_bag "runId=${run_id}"
+            - write_output {{ .Values.namePrefix }}_bag "timestamp=$(date +%s)"
             - write_output {{ .Values.namePrefix }}_bag "releaseVersion=${pipeline_name}.${run_number}"
 
       - name: run_variable_step
@@ -69,7 +69,7 @@ pipelines:
           onStart:
             - echo "This step will write to a value to a run variable"
           onExecute:
-            - add_run_variables step_info="runNumber-- $run_number, step_name-- $step_name, pipeline_name-- $pipeline_name"
+            - add_run_variables step_info="runNumber $run_number, step_name $step_name, pipeline_name $pipeline_name"
 
       - name: print_resource_step
         type: Bash
@@ -78,7 +78,8 @@ pipelines:
             - name: {{ .Values.namePrefix }}_bag
         execution:
           onExecute:
-            - echo "message is -- ${res_{{ .Values.namePrefix }}_bag_message}"
+            - echo "Release Version is -- ${releaseVersion}"
+            - echo "Release timestamp is -- ${timestamp}"
 
       - name: print_variable_step
         type: Bash
@@ -96,7 +97,8 @@ pipelines:
           onStart:
             - if [ ${forceFail} == "true" ]; then exit 1; fi
           onExecute:
-            - echo "Printing step_info from previous step-- ${step_info}"
+            - echo "Printing step_info from previous step"
+            - echo "${step_info}"
           onFailure:
             - echo "step has failed."
           onSuccess:
