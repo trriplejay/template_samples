@@ -63,21 +63,9 @@ pipelines:
             - write_output {{ .Values.namePrefix }}_bag "timestamp=$(date +%s)"
             - write_output {{ .Values.namePrefix }}_bag "releaseVersion=${pipeline_name}.${run_number}"
 
-      - name: print_resource_step
-        type: Bash
-        configuration:
-          inputResources:
-            - name: {{ .Values.namePrefix }}_bag
-        execution:
-          onExecute:
-            - echo "Release Version is -- ${releaseVersion}"
-            - echo "Release timestamp is -- ${timestamp}"
-
-
       - name: run_variable_step
         type: Bash
         configuration:
-          affinityGroup: step_info_collection
           inputSteps:
             - name: first_step
         execution:
@@ -85,14 +73,14 @@ pipelines:
             - echo "This step will write to a value to a run variable, and add a file to the affinity group shared space."
           onExecute:
             - add_run_variables step_info="runNumber $run_number, step_name $step_name, pipeline_name $pipeline_name"
-            - echo "${step_info}" > ${shared_workspace}/step_info.txt
 
-      - name: print_variable_step
+      - name: final_step
         type: Bash
         configuration:
-          affinityGroup: step_info_collection
           inputSteps:
             - name: run_variable_step
+          inputResources:
+            - name: {{ .Values.namePrefix }}_bag
           environmentVariables:
             forceFail:
               default: "false"
@@ -107,10 +95,12 @@ pipelines:
             - echo "Printing step_info from previous step"
             - echo "${step_info}"
             - cat ${shared_workspace}/step_info.txt
+            - echo "printing resource details"
+            - echo "Release Version is -- ${res_{{ .Values.namePrefix }}_bag_releaseVersion}"
+            - echo "Release timestamp is -- ${res_{{ .Values.namePrefix }}_bag_timestamp}"
           onFailure:
             - echo "step has failed."
           onSuccess:
             - echo "step has succeeded."
           onComplete:
             - echo "onComplete executes regardless of success or failure. forceFail is ${forceFail}"
-
