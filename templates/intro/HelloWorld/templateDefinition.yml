@@ -11,7 +11,7 @@ resources:
   - name: {{ .Values.namePrefix }}_bag
     type: PropertyBag
     configuration:
-      message: ""
+      releaseVersion: ""
 
 {{ if .Values.repo.integrationName }}
   - name: {{ .Values.namePrefix }}_repo
@@ -52,16 +52,13 @@ pipelines:
             - name: first_step
           outputResources:
             - name: {{ .Values.namePrefix }}_bag
-          environmentVariables:
-            step_message:
-              allowCustom: true
-              default: "this message is from step ${step_name}"
-              description: "This message will pass to the next step when written to the resource"
+
         execution:
           onStart:
-            - echo "sending message -- ${step_message} to resource {{ .Values.namePrefix }}_bag"
+            - echo "Updating resource {{ .Values.namePrefix }}_bag with new key/value pairs"
           onExecute:
-            - write_output {{ .Values.namePrefix }}_bag "message=${step_message}"
+            - write_output {{ .Values.namePrefix }}_bag "runId=${run_id}"
+            - write_output {{ .Values.namePrefix }}_bag "releaseVersion=${pipeline_name}.${run_number}"
 
       - name: run_variable_step
         type: Bash
