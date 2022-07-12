@@ -63,6 +63,7 @@ pipelines:
       - name: run_variable_step
         type: Bash
         configuration:
+          affinityGroup: step_info_collection
           inputSteps:
             - name: first_step
         execution:
@@ -84,6 +85,7 @@ pipelines:
       - name: print_variable_step
         type: Bash
         configuration:
+          affinityGroup: step_info_collection
           inputSteps:
             - name: run_variable_step
           environmentVariables:
