@@ -25,6 +25,8 @@ resources:
 
 pipelines:
   - name: {{ .Values.namePrefix }}_hello_world
+    configuration:
+      jfrogCliVersion: 2
     steps:
       - name: first_step
         type: Bash
