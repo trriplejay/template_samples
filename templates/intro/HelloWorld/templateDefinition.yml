@@ -89,24 +89,14 @@ pipelines:
           inputSteps:
             - name: run_variable_step
             - name: variable_selection_step
-        execution:
-          onStart:
-            - echo "This step will print the value of the run variable added by the previous step"
-          onExecute:
-            - echo "Printing step_info from previous step"
-            - echo "${step_info}"
-
-      - name: output_resource_step
-        type: Bash
-        configuration:
-          inputSteps:
-            - name: verify_details_step
           outputResources:
             - name: {{ .Values.namePrefix }}_bag
         execution:
           onStart:
-            - echo "Updating resource {{ .Values.namePrefix }}_bag with new key/value pairs"
+            - echo "Printing step_info from previous step"
+            - echo "${step_info}"
           onExecute:
+            - echo "Updating resource {{ .Values.namePrefix }}_bag with new key/value pairs"
             - write_output {{ .Values.namePrefix }}_bag "timestamp=$(date +%s)"
             - write_output {{ .Values.namePrefix }}_bag "releaseVersion=${pipeline_name}.${run_number}"
             - write_output {{ .Values.namePrefix }}_bag "stepInfo=${step_info}"
