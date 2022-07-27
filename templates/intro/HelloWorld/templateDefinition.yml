@@ -1,12 +1,3 @@
-###
-## Hello World
-# This pipeline is designed to showcase some basic JFrog Pipelines functionality
-###
-# resources usually represent static artifacts or configurations. In
-# this example we're using a simple "PropertyBag" to hold some
-# key value pairs.  Resources can be referenced when they are inputs
-# to steps, and they can even be updated when they are outputs from steps.
-##
 resources:
   - name: {{ .Values.namePrefix }}_bag
     type: PropertyBag
@@ -41,6 +32,9 @@ pipelines:
           onExecute:
             - echo "onExecute is the main section where you would issue your build/test commands"
             - jfrog --version
+          {{ if .Values.repo.integrationName }}
+            - echo "{{ .Values.namePrefix }}_repo sha is ${{{ .Values.namePrefix }}_repo_commitSha}"
+          {{ end }}
           onSuccess:
             - echo "onSuccess executes if the onStart or onExecute sections completed without errors"
           onFailure:
